@@ -2,6 +2,17 @@
 
 A 3D world displayed via PyOpenGL.
 
+## Run:
+
+Dependencies:
+- python `OpenGL.GL` and `OpenGL.GLUT` bindings
+- numpy
+- 
+
+```
+python3 
+```
+
 ## Goal:
 
 Basically to make a mini minecraft-like game.

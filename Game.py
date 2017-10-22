@@ -16,6 +16,7 @@ class Game:
         self.w = args['width']
         self.h = args['height']
         self.dt = args['dt']
+        self.fullscreen = args['fullscreen']
 
         # input
         self.input = Input(self,args['keycaps'])
@@ -31,20 +32,32 @@ class Game:
         self.t = time()
 
         # scenes
-        self.scenes = {}
+        self.scenes = []
+        self.scene_names = []
         self.current = None
 
-    def addScene(self,scene): self.scenes[scene.name] = scene
-
-    def setScene(self,name): self.current = self.scenes[name]
+    # sets scene and calls `scene.start()`
+    # can pass scene name or serial id
+    def setScene(self,id):
+        if isinstance(id,int):
+            self.current = self.scenes[id]
+            self.current.start()
+        if isinstance(id,str):
+            self.current = self.scenes[self.scene_names.index(id)]
+            self.current.start()
+        else: print("[!] invalid scene id")
 
     def update(self,x):
+        # main controls
         if self.input.esc(): self.quit()
+        if self.input.isDown(b'1'): self.setFullscreen(0)
+        if self.input.isDown(b'2'): self.setFullscreen(1)
 
         nt = time()
         dt = nt - self.t
         self.current.update(dt) # scene
-        self.player.update(dt) # player
+        self.cam.update(dt)  # camera
+        self.player.update(dt)  # player
         glutPostRedisplay()
         
         if self.active:
@@ -57,11 +70,10 @@ class Game:
         # init rendering
         glutInit([])
         glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
-        glutInitWindowPosition(int(glutGet(GLUT_SCREEN_WIDTH)/2 - self.w/2), int(glutGet(GLUT_SCREEN_HEIGHT)/2 - self.h/2))
         glutInitWindowSize(self.w, self.h)
         glutCreateWindow(self.name)
         glEnable(GL_DEPTH_TEST)
-        # glEnable(GL_BLEND)
+        # glEnable(GL_BLEND) # idk how to use this
 
         # register callbacks
         glutDisplayFunc(self.display)
@@ -69,7 +81,7 @@ class Game:
         self.input.setupGlutInputFuncs()
 
         # fullscreen
-        glutFullScreen()
+        if self.fullscreen: glutFullScreen()
 
         # game loop
         print("starting game loop")
@@ -79,6 +91,15 @@ class Game:
         glutMainLoop()
 
         return 0
+
+    def setFullscreen(self,fs):
+        if fs and not self.fullscreen:
+            glutFullScreen()
+            self.fullscreen = True
+        elif not fs and self.fullscreen:
+            glutReshapeWindow(self.w, self.h)
+            glutPositionWindow(0,0)
+            self.fullscreen = False
 
     def quit(self):
         self.active = False
@@ -94,7 +115,6 @@ class Game:
         # player start draw
         self.player.startdraw()
         
-
         # scene
         self.current.display()
 

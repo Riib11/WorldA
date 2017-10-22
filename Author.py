@@ -1,6 +1,9 @@
 from Scenes.TestScene import TestScene
+from Scenes.RotatingCube import RotatingCube
 
 def start(game):
-    game.addScene(TestScene(game))
-    game.setScene("TestScene")
+    # TestScene(game)
+    RotatingCube(game)
+
+    game.setScene("RotatingCube")
     game.main()

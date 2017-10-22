@@ -13,35 +13,37 @@ class Player:
         self.mv_fwd = Vec([0,0,1])
         self.mv_rgt = Vec([1,0,0])
         self.mv_up = Vec([0,1,0])
-        self.speed = 2.0
+        self.speed = 5.0
+
+    def reorient(self):
+        pass # this doesn't work
+        self.mv_fwd = self.game.cam.tfm.orientVec(self.mv_fwd)
+        self.mv_rgt = self.game.cam.tfm.orientVec(self.mv_rgt)
+        self.mv_up = self.game.cam.tfm.orientVec(self.mv_up)
 
     def update(self,dt):
-        ipt = self.game.input
+        isDown = self.game.input.isDown
 
-        # move
+        # want to move relative to camera look
+        # self.reorient()
 
-        # left
-        if ipt.isDown(b'a'): self.tfm.trans(
-            self.speed * dt * self.mv_rgt)
-        # right
-        elif ipt.isDown(b'd'): self.tfm.trans(
-            -self.speed * dt * self.mv_rgt)
-        # forward
-        if ipt.isDown(b's'): self.tfm.trans(
-            -self.speed * dt * self.mv_fwd)
-        # backward
-        elif ipt.isDown(b'w'): self.tfm.trans(
-            self.speed * dt * self.mv_fwd)
-        # up
-        if ipt.isDown(b'q'): self.tfm.trans(
-            -self.speed * dt * self.mv_up)
-        # down
-        if ipt.isDown(b'e'): self.tfm.trans(
-            self.speed * dt * self.mv_up)
+        # moving
+        rgt,fwd,up = 0,0,0
+
+        # left/right
+        if isDown(b'a')  : rgt = 1
+        elif isDown(b'd'): rgt = -1
+        # for/back
+        if isDown(b's')  : fwd = -1
+        elif isDown(b'w'): fwd = 1
+        # up/down
+        if isDown(b'q')  : up = -1
+        if isDown(b'e')  : up = 1
+
+        self.tfm.translate( self.speed * dt * (rgt*self.mv_rgt + fwd*self.mv_fwd + up*self.mv_up) )
 
     def startdraw(self):
-        Stack.start()
-        self.tfm() # center self
+        self.tfm.center()
 
     def enddraw(self):
-        Stack.end()
+        self.tfm.uncenter()

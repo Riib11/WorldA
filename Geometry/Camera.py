@@ -2,32 +2,42 @@ from OpenGL.GLUT import *
 from OpenGL.GL import *
 from math import pi
 
-from Geometry.Basics import *
 import Geometry.Stack as Stack
+import Utility.Constants as Consts
+
+from Geometry.Basics import *
 
 class Cam:
     def __init__(self,game,tfm=None):
         self.game = game
-        
+        self.active = True
+        self.sensativity = 1
         # relative to player
         self.tfm = tfm or Tfm.zero()
-        
-        self.rot = [0,0]
-        self.drot = [10000,10000,10000]
+
+    def rotstep(self,dh,dv):
+        h = Rot(dh * self.sensativity, Vec.e(1))
+        v = Rot(dv * self.sensativity, Vec.e(2))
+        self.tfm.rotate(h,1)
+        self.tfm.rotate(v,2)
+
+    def update(self,dt):
+        dh,dv = 0,0
+        if self.game.input.isDown(b'g'): dh = 1
+        elif self.game.input.isDown(b't'): dh = -1
+        if self.game.input.isDown(b'f'): dv = -1
+        elif self.game.input.isDown(b'h'): dv = 1
+        self.rotstep(dh*dt,dv*dt)
 
     def startdraw(self):
-        # update rotation via mouse
-        if self.game.input.mfocus:
-            self.rot = self.game.input.mpos
+        self.tfm.center()
 
-        # camera transormation
-        Stack.start()
-        # translate to cam pos
-        Stack.push(); (-1 * self.tfm.p.vec())()
-        # rotate y axis
-        Stack.push(); glRotatef( self.rot[0] * self.drot[0] / 180*pi ,0,1,0)
-        # rotate x axis
-        Stack.push(); glRotatef(-self.rot[1] * self.drot[1] / 180*pi ,1,0,0)
+        # # TEMP: a fix
+        # update rotation via mouse
+        # x,y = self.game.input.mpos
+        # Stack.start()
+        # Stack.push(); glRotatef( self.rot[0]*self.sensativity,0,1,0)
+        # Stack.push(); glRotatef(-self.rot[1]*self.sensativity,1,0,0)
 
     def enddraw(self):
-        Stack.end() # end cam trans section
+        self.tfm.uncenter()

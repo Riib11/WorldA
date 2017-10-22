@@ -1,3 +1,4 @@
+import sys
 from OpenGL.GLUT import *
 from OpenGL.GL import *
 
@@ -10,16 +11,22 @@ def start():
     stack.append(0)
 
 def push():
-    stack[-1] += 1
-    glPushMatrix()
-    # print("push",stack[-1]-1,"->",stack[-1])
+    try:
+        stack[-1] += 1
+        glPushMatrix()
+    except Exception as e:
+        print(e)
+        sys.exit(1)
 
 def pop():
-    if stack[-1] > 0:
-        stack[-1] -= 1
-        glPopMatrix()
-        # print("pop",stack[-1]+1,"->",stack[-1])
-    else: raise ValueError("An extra pop was called")
+    try:
+        if stack[-1] > 0:
+            stack[-1] -= 1
+            glPopMatrix()
+        else: raise ValueError("An extra pop was called")
+    except Exception as e:
+        print(e)
+        sys.exit(1)
 
 # end stack section
 def end():
@@ -28,4 +35,3 @@ def end():
         # pop everything before ending section
         for i in range(stack[-1]): pop()
     del stack[-1]
-    # print("-- end section",len(stack)+1)
