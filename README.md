@@ -5,9 +5,9 @@ A 3D world displayed via PyOpenGL.
 ## Run:
 
 Dependencies:
-- python `OpenGL.GL` and `OpenGL.GLUT` bindings
+- python3
+- the python `OpenGL.GL` and `OpenGL.GLUT` bindings
 - numpy
-- 
 
 ```
 python3 
