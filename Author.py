@@ -1,9 +1,10 @@
-from Scenes.TestScene import TestScene
 from Scenes.RotatingCube import RotatingCube
+import Scenes.Loader
 
 def start(game):
-    # TestScene(game)
-    RotatingCube(game)
+    # load scenes
+    Scenes.Loader.loadAll(game)
 
+    # set scene
     game.setScene("RotatingCube")
     game.main()

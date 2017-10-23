@@ -7,7 +7,7 @@ import numpy as np
 import Geometry.Stack as Stack
 import Utility.Constants as Consts
 
-from Output.Colors import *
+from Geometry.Colors import *
 
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -274,15 +274,17 @@ class Rot:
 
     def apply(self,v=None):
         if v:
-            # rotate a vector
-            q = self.q
-            q.r *= 180/math.pi # convert to degrees
             qp = self.q * Quat.fromVec(v) * -self.q
-            return qp.vec()
+            return qp.vec().norm()
         else:
             Stack.push()
             glRotatef(self.t*180/math.pi,self.v[0],self.v[1],self.v[2])
     __call__ = apply
+
+    def neg(self): return Rot(-self.t,self.v)
+
+    def neg(self): return (-self.q).rot()
+    __neg__ = neg
 
     def tostring(self): return "Rot(" + str(self.t) + ":" + str(self.v) + ")"
     __str__ = tostring
@@ -308,8 +310,7 @@ class Quat:
 
     @classmethod
     # create from axis vector and rotation
-    def fromAngVec(cls,t,v,deg=False):
-        if deg: t *= 2 * math.pi / 360
+    def fromAngVec(cls,t,v):
         costd2 = math.cos(t/2)
         sintd2 = math.sin(t/2)
         return cls(costd2, sintd2*v[0], sintd2*v[1], sintd2*v[2])
@@ -396,14 +397,17 @@ class Tfm:
 
     def uncenter(self): Stack.end()
 
-    # TODO: incorperate this into matrix transformations
-    def orientVec(self,v):
-        v = self.rot(v)
-        for r in self.srots:
-            if r: v = r(v)
-        return v
+    def orient(self,v,excluded=[]):
+        w = (-self.rot)(v)
+        for i in range(len(self.srots)):
+            r = self.srots[i]
+            if r and not (i in excluded):
+                w = (-r)(w)
+        return w
 
     def translate(self,v): self.p = self.p + v
+
+    def setPosition(self,p): self.p = p
 
     # index if for a sequential rotation
     def rotate(self,rot,i=0):
@@ -416,6 +420,9 @@ class Tfm:
             # is initialized
             else: self.srots[i] = self.srots[i] + rot
 
+    def setRotation(self,rot,i=0):
+        if not i: self.rot = rot
+        else: self.srots[i] = rot
 
     def debug(self,size=1,ps=1,lw=1):
         p0 = Pnt.zero()

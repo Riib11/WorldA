@@ -16,16 +16,14 @@ class Player:
         self.speed = 5.0
 
     def reorient(self):
-        pass # this doesn't work
-        self.mv_fwd = self.game.cam.tfm.orientVec(self.mv_fwd)
-        self.mv_rgt = self.game.cam.tfm.orientVec(self.mv_rgt)
-        self.mv_up = self.game.cam.tfm.orientVec(self.mv_up)
+        return (self.game.cam.tfm.orient(self.mv_fwd,[1]),
+                self.game.cam.tfm.orient(self.mv_rgt,[1]))
 
     def update(self,dt):
         isDown = self.game.input.isDown
 
         # want to move relative to camera look
-        # self.reorient()
+        mv_cam_fwd, mv_cam_rgt = self.reorient()
 
         # moving
         rgt,fwd,up = 0,0,0
@@ -40,7 +38,11 @@ class Player:
         if isDown(b'q')  : up = -1
         if isDown(b'e')  : up = 1
 
-        self.tfm.translate( self.speed * dt * (rgt*self.mv_rgt + fwd*self.mv_fwd + up*self.mv_up) )
+        self.tfm.translate(self.speed * dt * (
+            fwd * mv_cam_fwd + 
+            rgt * mv_cam_rgt + 
+            up  * self.mv_up
+        ))
 
     def startdraw(self):
         self.tfm.center()

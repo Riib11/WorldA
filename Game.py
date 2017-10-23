@@ -2,15 +2,25 @@ import sys
 from OpenGL.GLUT import *
 from OpenGL.GL import *
 from time import time
-from Output.Colors import *
+from Geometry.Colors import *
 
 from Input.Input import Input
+from Geometry.Drawer import Drawer
 from Geometry.Camera import Cam
 from Geometry.Player import Player
 
 class Game:
 
     def __init__(self,args):
+        print(
+            "---------------------------------------------------------\n" +
+            "| starting game: WorldA\n"
+            "---------------------------------------------------------\n" +
+            "| * controls:\n" +
+            "|     - #1 / #2      : enter/exit fullscreen\n" + 
+            "|     - esc          : quit\n" +
+            "---------------------------------------------------------\n"
+        )
         # params
         self.name = args['name']
         self.w = args['width']
@@ -20,6 +30,9 @@ class Game:
 
         # input
         self.input = Input(self,args['keycaps'])
+
+        # drawer
+        self.drawer = Drawer(self)
 
         # cam
         self.cam = Cam(self)
@@ -84,7 +97,6 @@ class Game:
         if self.fullscreen: glutFullScreen()
 
         # game loop
-        print("starting game loop")
         glutTimerFunc(self.dt,self.update,0)
 
         # glut loop
@@ -94,14 +106,17 @@ class Game:
 
     def setFullscreen(self,fs):
         if fs and not self.fullscreen:
+            print("[*] enabling full screen")
             glutFullScreen()
             self.fullscreen = True
         elif not fs and self.fullscreen:
+            print("[*] disabling full screen")
             glutReshapeWindow(self.w, self.h)
             glutPositionWindow(0,0)
             self.fullscreen = False
 
     def quit(self):
+        print("[*] quiting game")
         self.active = False
 
     def display(self):
@@ -110,18 +125,12 @@ class Game:
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-        # camera start draw
-        self.cam.startdraw()
-        # player start draw
-        self.player.startdraw()
         
-        # scene
-        self.current.display()
-
-        # player end draw
-        self.player.enddraw()
-        # camera end draw
-        self.cam.enddraw()
+        self.cam.startdraw()    # camera start draw
+        self.player.startdraw() # player start draw
+        self.current.display()  # scene
+        self.player.enddraw()   # player end draw
+        self.cam.enddraw()      # camera end draw
         
         # render
         glFlush()

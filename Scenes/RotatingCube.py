@@ -8,7 +8,7 @@ import Geometry.Stack as Stack
 import Geometry.Stack as Stack
 import Utility.Constants as Consts
 
-from Output.Colors import *
+from Geometry.Colors import *
 from Geometry.Basics import *
 from Geometry.Shapes import *
 
@@ -19,22 +19,14 @@ class RotatingCube(Scene):
 
     def start(self):
         print(
-            "\n|\n"
-            "---------------------------------------------------------\n" +
-            "| starting game: WorldA\n"
-            "---------------------------------------------------------\n" +
-            "| * controls:\n" +
-            "|     - #1 / #2      : enter/exit fullscreen\n" + 
-            "|     - esc          : quit\n" +
             "---------------------------------------------------------\n" +
             "| starting level: Rotating Cube\n" +
             "---------------------------------------------------------\n" +
             "| * controls:\n"
             "|     - a/d/w/s/q/d  : move left/right/for/back/up/down\n" +
-            "|     - f/h/t/g      : look left/right/up/down\n" + 
+            "|     - mouse        : look\n" + 
             "|     - j/l/i/k      : rotate the cube\n" + 
-            "---------------------------------------------------------\n" +
-            "|\n"
+            "---------------------------------------------------------\n"
         )
 
         self.unit = 1.0
@@ -82,11 +74,11 @@ class RotatingCube(Scene):
         # cube
         glclr('white')
         self.cube()
-        glclr('black')
-        glLineWidth(10)
-        self.cube.lines()
-        glclr('orange')
-        glPointSize(20)
-        self.cube.points()
+        # glclr('black')
+        # glLineWidth(10)
+        # self.cube.lines()
+        # glclr('orange')
+        # glPointSize(20)
+        # self.cube.points()
 
         Stack.end()

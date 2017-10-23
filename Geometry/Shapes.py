@@ -4,7 +4,7 @@ from OpenGL.GL import *
 import Geometry.Stack as Stack
 
 from Geometry.Basics import *
-from Output.Colors import *
+from Geometry.Colors import *
 
 class Pln:
     def __init__(self,p,n):
@@ -59,9 +59,7 @@ class Tri(Facet):
         (a,b,c) = ps
         super().__init__(ps,(b-a)^(c-a))
     def gldraw(self):
-        glBegin(GL_TRIANGLES)
         for p in self: p()
-        glEnd()
     __call__ = gldraw
 
 class Quad(Facet):
@@ -69,10 +67,8 @@ class Quad(Facet):
         (a,b,c,d) = ps
         super().__init__(ps,(b-a)^(d-a))
     def gldraw(self):
-        glBegin(GL_TRIANGLES)
         self[0](); self[1](); self[3]()
         self[1](); self[2](); self[3]()
-        glEnd()
     __call__ = gldraw
 
 #
@@ -98,7 +94,9 @@ class Obj:
     
     def gldraw(self):
         self.tfm.center()
+        glBegin(GL_TRIANGLES)
         for f in self: f()
+        glEnd()
         self.tfm.uncenter()
     __call__ = gldraw
     
